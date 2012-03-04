@@ -96,10 +96,21 @@ class XcodeProxy
   end
 
   def mkgroup(group)
-    @app.projects[@project].root_group.make(
-      :new => :Xcode_3_group, 
-      :with_properties => {:name => group}
-    )
+    groups = group.split(/\//)
+    group_prev = @app.projects[@project].root_group
+    for group_name in groups do
+      puts "Generate group: " + group_name
+      group_current = find_group(group_prev, group_name)
+      puts "Making group: " + group_current.to_s
+      if not defined? group_current or group_current.nil?
+        puts "Making group: " + group_name
+        group_prev.make(
+          :new => :Xcode_3_group, 
+          :with_properties => {:name => group_name}
+        )
+      end
+      group_prev = find_group(group_prev, group_name)
+    end
   end
 
   def rmgroup(group)
